@@ -1,4 +1,4 @@
 ## [我的Blog](https://blog.onemue.cn/)
 
 ## DEMO内容
-[我的Blog](https://blog.onemue.cn/)
+[Beat-the-wolf(锅拍灰太狼)](https://onemue.github.io/jQueryDemo/Beat-the-wolf/)
