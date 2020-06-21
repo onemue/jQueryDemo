@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.js"></script>
+    <title>锅打灰太狼</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .game-box {
+            position: relative;
+            margin: 50px auto;
+            width: 320px;
+            height: 480px;
+            background-image: url("images/game_bg.jpg");
+            cursor: url(src/arrow.cur), default;
+
+        }
+
+        .fraction {
+            position: absolute;
+            top: 0px;
+            left: 60px;
+            font-size: 24px;
+            line-height: 45px;
+            color: #fdfdfd;
+        }
+
+        .progress {
+            position: absolute;
+            top: 66px;
+            left: 63px;
+            width: 180px;
+            height: 16px;
+            background-image: url("images/progress.png");
+        }
+
+        .wolf-box {
+            position: absolute;
+            width: 320px;
+            height: 240px;
+            /* top: 180px;
+            left: 0px; */
+            font-size: 24px;
+            line-height: 45px;
+            /* background-color: #fdfdfd60; */
+        }
+
+        .start {
+            position: absolute;
+            top: 300px;
+            left: 50%;
+            margin-left: -54px;
+            width: 108px;
+            height: 32px;
+            border-radius: 32px;
+            background-color: #fa8c16;
+            color: #FFF;
+            border: 1px solid #ffd591;
+            cursor: url(src/arrow.cur), default;
+
+        }
+
+        .rules {
+            position: absolute;
+            bottom: 0;
+            top: auto;
+            width: 320px;
+            height: 32px;
+            line-height: 32px;
+            color: #fff;
+            background-color: #333333;
+            text-align: center;
+        }
+
+        .mask {
+            display: none;
+            position: absolute;
+            top: 0;
+            width: 320px;
+            height: 380px;
+            background-color: #33333360;
+            text-align: center;
+            padding-top: 100px;
+            line-height: 32px;
+            color: #fff;
+        }
+
+        .mask>.closeMask>a {
+            color: red;
+        }
+
+        .gameOver {
+            display: none;
+            position: absolute;
+            top: 0;
+            width: 320px;
+            height: 280px;
+            padding-top: 200px;
+            background-color: #33333380;
+            text-align: center;
+        }
+
+        .reStart {
+            position: absolute;
+            top: 300px;
+            left: 50%;
+            margin-left: -54px;
+            width: 108px;
+            height: 32px;
+            border-radius: 32px;
+            background-color: #fa8c16;
+            color: #FFF;
+            border: 1px solid #ffd591;
+            cursor: url(src/arrow.cur), default;
+
+        }
+
+        .gameOver>h1 {
+            color: #f5222d;
+            text-shadow: 3px 3px #FFFFFF;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-box">
+        <div class="fraction">0</div>
+        <div class="progress"></div>
+        <div class="wolf-box"></div>
+        <button class="start">开始游戏</button>
+        <div class="rules"><span>游戏规则</span></div>
+        <div class="mask">
+            <p class="maskText">游戏规则</p>
+            <p>1.游戏时间:60s</p>
+            <p>2.拼手速,殴打灰太狼+10分</p>
+            <p>3.殴打小灰灰-10分</p>
+            <p class="closeMask"><a>[关闭]</a></p>
+        </div>
+        <div class="gameOver">
+            <h1>GAME OVER</h1>
+            <button class="reStart">重新开始</button>
+        </div>
+    </div>
+    <audio src="src/FC游戏音乐版－喜羊羊与灰太狼_爱给网_aigei_com.mp3" autoplay="autoplay" id="background-music" loop="loop"></audio>
+    <audio src="src/[1600] 短配乐-敲击鼓钹元素23(Percussion_爱给网_aigei_com.mp3"  id="tap-music"></audio>
+
+
+</body>
+<script>
+
+    var game_init = {
+        time: 20
+    }
+    var woliType = ["x", "h"]
+    var xArr = ["x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9"];
+    var hArr = ["h0", "h1", "h2", "h3", "h4", "h5", "h6", "h7", "h8", "h9"];
+    // var woliPitArr = [
+    //     ["100px", "100px"],
+    //     ["100px", "100px"],
+    //     ["100px", "100px"],
+    //     ["100px", "100px"],
+    //     ["100px", "100px"],
+    //     ["100px", "100px"],
+    //     ["100px", "100px"],
+    //     ["100px", "100px"],
+    //     ["100px", "100px"]
+    // ];
+    var woliPitArr = [
+            {left:"100px",top:"115px"},
+            {left:"20px",top:"160px"},
+            {left:"190px",top:"142px"},
+            {left:"105px",top:"193px"},
+            {left:"19px",top:"221px"},
+            {left:"202px",top:"212px"},
+            {left:"120px",top:"275px"},
+            {left:"30px",top:"295px"},
+            {left:"209px",top:"297px"}
+        ];
+    var progressWight = 180;
+    var progressTimer;
+    var woliTimer;
+    var startTimer;
+    var tapMusic = $("#tap-music")[0]; /*jquery对象转换成js对象*/
+    var backgroundMusic = $("#background-music")[0]; /*jquery对象转换成js对象*/
+    $(function () {
+        backgroundMusic.volume = 0.2;
+        backgroundMusic.play();
+        $(".rules").click(function () {
+            // 显示 mask 图层
+            $(".mask").show();
+        });
+        $(".closeMask>a").click(function () {
+            // 隐藏 mask 图层
+            $(".mask").hide();
+        });
+        $(".start").click(function () {
+            // 开始按钮
+            tapMusic.load();
+            tapMusic.play();
+            progressChange();
+            $(".start").hide();
+            startTimer = setInterval(function (param) {randomWoli()},2000);
+        });
+        $(".reStart").click(function () {
+            // 重新开始按钮
+            progressWight = 190;
+            $(".gameOver").hide();
+            $(".fraction").text = 0;
+            fraction("init");
+            progressChange();
+            startTimer = setInterval(function (param) {randomWoli()},2000);
+
+        });
+    });
+    function progressChange() {
+        // 进度条改变
+        progressTimer = setInterval(function () {
+            progressWight = progressWight - 180 / game_init.time;
+            console.log(progressWight);
+            $(".progress").width(progressWight)
+            if (progressWight < 0) {
+                // 游戏结束
+                console.log("停止");
+                $(".gameOver").show();
+                clearInterval(startTimer);
+                clearInterval(progressTimer);
+            }
+        }, 1000);
+    }
+    function randomWoli() {
+        var i = parseInt(Math.random() * 9, 10);
+        var j = Math.round(Math.random());
+        console.log(i, j);
+        coordinate = woliPitArr[i];
+        var woli = $("<div class='woli'></div>").css({
+            width: "108px",
+            height: "101px",
+            position: "absolute",
+            top: coordinate["top"],
+            left: coordinate["left"],
+            "background-image": "url(images/" + woliType[j] + "0.png)",
+        }).ready(function () {
+            // alert("a woli is ready")
+            // var woli = $(".woli");
+            var index = 0;
+            woliTimer = setInterval(function () {
+                index++;
+                var imageUrl = "url(images/" + woliType[j] + index + ".png)";
+                console.log(imageUrl);
+                $(".woli").css("background-image", imageUrl);
+                if (index >= 5) {
+                    $(".woli").remove();
+                    clearInterval(woliTimer);
+                }
+            }, 200);
+        })
+        $("*").click(function () {
+            tapMusic.load();
+            tapMusic.play();
+        });
+        $(".wolf-box").append(woli);
+        $(".woli").click(function () {
+            // alert("砸到");
+            if (woliType[j] == "h") {
+                fraction(10);
+            }
+            if (woliType[j] == "x") {
+                fraction(-10);
+            }
+            clearInterval(woliTimer);
+            var index = 6;
+            woliTimer = setInterval(function () {
+                index++;
+                var imageUrl = "url(images/" + woliType[j] + index + ".png)";
+                console.log(imageUrl);
+                $(".woli").css("background-image", imageUrl);
+                if (index >= 9) {
+                    clearInterval(woliTimer);
+                    $(".woli").remove();
+                }
+            }, 200);
+        });
+    }
+    function fraction(number) {  
+        if (number == "init") {
+            $(".fraction").html(00);
+        }else{
+            $(".fraction").html(parseInt($(".fraction").html()) + number);
+        }
+    }
+</script>
+
+</html>
