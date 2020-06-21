@@ -149,28 +149,13 @@
     </div>
     <audio src="src/FC游戏音乐版－喜羊羊与灰太狼_爱给网_aigei_com.mp3" autoplay="autoplay" id="background-music" loop="loop"></audio>
     <audio src="src/[1600] 短配乐-敲击鼓钹元素23(Percussion_爱给网_aigei_com.mp3"  id="tap-music"></audio>
-
-
 </body>
 <script>
 
     var game_init = {
-        time: 20
-    }
+        time: 30
+    }  // 初始化属性
     var woliType = ["x", "h"]
-    var xArr = ["x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9"];
-    var hArr = ["h0", "h1", "h2", "h3", "h4", "h5", "h6", "h7", "h8", "h9"];
-    // var woliPitArr = [
-    //     ["100px", "100px"],
-    //     ["100px", "100px"],
-    //     ["100px", "100px"],
-    //     ["100px", "100px"],
-    //     ["100px", "100px"],
-    //     ["100px", "100px"],
-    //     ["100px", "100px"],
-    //     ["100px", "100px"],
-    //     ["100px", "100px"]
-    // ];
     var woliPitArr = [
             {left:"100px",top:"115px"},
             {left:"20px",top:"160px"},
@@ -183,14 +168,18 @@
             {left:"209px",top:"297px"}
         ];
     var progressWight = 180;
-    var progressTimer;
-    var woliTimer;
-    var startTimer;
-    var tapMusic = $("#tap-music")[0]; /*jquery对象转换成js对象*/
-    var backgroundMusic = $("#background-music")[0]; /*jquery对象转换成js对象*/
+    var progressTimer; // 进度条管理器
+    var woliTimer;  // 狼的管理器
+    var startTimer;  // 开始的事件管理器
+    var tapMusic = $("#tap-music")[0]; /*jquery对象转换成js对象*/ //点击音乐
+    var backgroundMusic = $("#background-music")[0]; // 背景音乐
     $(function () {
-        backgroundMusic.volume = 0.2;
-        backgroundMusic.play();
+        $("*").click(function () {
+            tapMusic.load(); // 重新加载
+            tapMusic.play(); // 点击
+        });
+        backgroundMusic.volume = 0.2; // 背景 音量
+        backgroundMusic.play(); // 播放背景音乐
         $(".rules").click(function () {
             // 显示 mask 图层
             $(".mask").show();
@@ -201,8 +190,6 @@
         });
         $(".start").click(function () {
             // 开始按钮
-            tapMusic.load();
-            tapMusic.play();
             progressChange();
             $(".start").hide();
             startTimer = setInterval(function (param) {randomWoli()},2000);
@@ -234,10 +221,10 @@
         }, 1000);
     }
     function randomWoli() {
-        var i = parseInt(Math.random() * 9, 10);
-        var j = Math.round(Math.random());
+        var i = parseInt(Math.random() * 9, 10); // 随机坑位
+        var j = Math.round(Math.random()); // 随机狼的种类
         console.log(i, j);
-        coordinate = woliPitArr[i];
+        coordinate = woliPitArr[i]; // 由坑位 到坐标
         var woli = $("<div class='woli'></div>").css({
             width: "108px",
             height: "101px",
@@ -246,8 +233,7 @@
             left: coordinate["left"],
             "background-image": "url(images/" + woliType[j] + "0.png)",
         }).ready(function () {
-            // alert("a woli is ready")
-            // var woli = $(".woli");
+            // 狼的动画效果
             var index = 0;
             woliTimer = setInterval(function () {
                 index++;
@@ -259,13 +245,10 @@
                     clearInterval(woliTimer);
                 }
             }, 200);
-        })
-        $("*").click(function () {
-            tapMusic.load();
-            tapMusic.play();
-        });
-        $(".wolf-box").append(woli);
+        }); // jQuery 狼对象
+        $(".wolf-box").append(woli); // 生成狼
         $(".woli").click(function () {
+            // 狼的单机事件
             // alert("砸到");
             if (woliType[j] == "h") {
                 fraction(10);
@@ -288,6 +271,7 @@
         });
     }
     function fraction(number) {  
+        // 改变分数
         if (number == "init") {
             $(".fraction").html(00);
         }else{
